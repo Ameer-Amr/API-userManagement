@@ -4,22 +4,21 @@ from .models import Account
     
 class UserRegister(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type':'password'},write_only=True)
+    profile_picture = serializers.ImageField(max_length=None,use_url=True)
     class Meta:
         model = Account
         fields = ['id','full_name','phone_number','email','dob','profile_picture','password','password2']
         extra_kwargs = {
             'password' : {'write_only':True}
         }
-    def get_profile_image_url(self, obj):
-        return obj.profile_picture.url
     
-    def create(self,validated_data):
-        password = validated_data.pop('password',None)
-        instance = self.Meta.model(**validated_data)
-        if password is not None:
-            instance.set_password(password)
-        instance.save()
-        return instance
+    # def create(self,validated_data):
+    #     password = validated_data.pop('password',None)
+    #     instance = self.Meta.model(**validated_data)
+    #     if password is not None:
+    #         instance.set_password(password)
+    #     instance.save()
+    #     return instance
     
     
     def save(self):
@@ -40,6 +39,8 @@ class UserRegister(serializers.ModelSerializer):
         reg.set_password(password)
         reg.save()
         return reg
+ 
+ 
     
 class UserDataSerializer(serializers.ModelSerializer):
     

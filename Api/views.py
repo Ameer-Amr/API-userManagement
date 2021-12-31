@@ -17,42 +17,17 @@ from rest_framework import mixins
 # Create your views here.
 
 
-
-# class RegisterView(APIView):
-#     parser_classes = [MultiPartParser, FormParser]
-#     def post(self,request):
-#         serializer = UserRegister(data=request.data)
-        
-#         data = {}
-
-#         if serializer.is_valid(raise_exception=True):
-#             reg = serializer.save()
-            
-#             data['response'] = "Registered Successfully"
-#             data['full_name'] = reg.full_name
-#             data['phone_number'] = reg.phone_number
-#             data['email'] = reg.email
-#             data['dob'] = reg.dob
-#             data['profile_picture'] = reg.profile_picture
-            
-#             refresh = RefreshToken.for_user(reg)
-#             data['token'] = {
-#                                 'refresh': str(refresh),
-#                                 'access': str(refresh.access_token),
-#                             }
-#         else:
-#             data = serializer.errors
-#         return Response(data) 
-
-
-class RegisterView(mixins.CreateModelMixin,generics.GenericAPIView):
-    queryset = Account.objects.all()
+class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegister
     parser_classes = [MultiPartParser, FormParser]
-    
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
+    def post(self, request, *args,  **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response({
+            "user": UserRegister(user,context=self.get_serializer_context()).data,
+            "message": "Registered Successfully.  Now perform Login to get your token",
+        })
 
 
 
@@ -88,3 +63,39 @@ class UserDetails(APIView):
         user = Account.objects.get(pk=id)
         user.delete()
         return Response({'message':'user deleted'})
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # class RegisterView(APIView):
+#     parser_classes = [MultiPartParser, FormParser]
+#     def post(self,request):
+#         serializer = UserRegister(data=request.data)
+        
+#         data = {}
+
+#         if serializer.is_valid(raise_exception=True):
+#             reg = serializer.save()
+            
+#             data['response'] = "Registered Successfully"
+#             data['full_name'] = reg.full_name
+#             data['phone_number'] = reg.phone_number
+#             data['email'] = reg.email
+#             data['dob'] = reg.dob
+#             data['profile_picture'] = reg.profile_picture
+            
+#             refresh = RefreshToken.for_user(reg)
+#             data['token'] = {
+#                                 'refresh': str(refresh),
+#                                 'access': str(refresh.access_token),
+#                             }
+#         else:
+#             data = serializer.errors
+#         return Response(data) 
